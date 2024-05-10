@@ -1,0 +1,100 @@
+/* /////// */
+/* GENERAL */
+/* /////// */
+
+body {
+  background: hsl(0, 0%, 95%);
+  display: grid;
+
+  height: 100dvh;
+  width: 100dvw;
+  overflow: hidden;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  
+  overflow: hidden;
+}
+
+/* ////// */
+/* CANVAS */
+/* ////// */
+
+canvas {
+  --border-hsl-lightness: 0%;
+  border: 1px solid black;
+  background: hsl(0, 0%, var(--border-hsl-lightness));
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#gameCanvas {
+  --border-hsl-lightness: 80%;
+}
+
+#nodeCanvas {
+  --border-hsl-lightness: 20%;
+}
+
+/* ///// */
+/* PANEL */
+/* ///// */
+
+#gameInfo {
+  display: flex; 
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 300px;
+}
+
+#titleAndDescription {
+  text-aign: center;
+}
+
+#titleAndDescription h2 {
+  font-size: 1.9rem;
+  font-weight: bold;
+  color: blue;
+}
+
+#rustOutputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+#rustOutputContainer label {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+#rustOutput {
+  overflow-y: auto;
+  padding: 0.25rem 0.5rem;
+  resize: none;
+  border-radius: var(--radius);
+}
+
+/* BUTTONS */
+
+#optionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+#optionButtons button {
+  padding: 0.5rem 1rem;
+  border: 1px solid black;
+  border-radius: var(--radius);
+  background: white;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+#optionButtons button:hover {
+  background: hsl(0, 0%, 80%);
+}

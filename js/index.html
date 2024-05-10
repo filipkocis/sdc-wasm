@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SDC - RUST WASM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/base.css" rel="stylesheet">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+
+    <script src="wasmLoader.js" type="module"></script>
+    <script src="main.js" type="module"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="gameInfo">
+        <div id="titleAndDescription">
+          <h2>Self Driving Car</h2>
+          <p>Made with Rust and WebAssembly</p>
+        </div>
+        <div id="rustOutputContainer">
+          <label for="rustOutput">Rust Output:</label>
+          <textarea id="rustOutput" readonly rows="10"></textarea>
+        </div>
+
+        <div id="optionButtons">
+          <button id="startButton">Start</button>
+          <button id="stopButton">Stop</button>
+          <button id="saveButton">Save</button>
+          <button id="loadButton">Load</button>
+          <button id="deleteButton">Delete</button>
+        </div>
+      </div>
+
+      <canvas id="gameCanvas" width="400" height="800"></canvas>
+      <canvas id="nodeCanvas" width="400" height="800"></canvas>
+    </div> 
+  </body>
+</html>

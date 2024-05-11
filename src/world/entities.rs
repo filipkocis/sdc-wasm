@@ -3,7 +3,7 @@ use crate::{world::*, Drawable};
 pub struct Entities {
     pub cars: Vec<Car>,
     // pub player: Option<Player>,
-    // pub road: Road,
+    pub road: Road,
     // pub finish_line: FinishLine,
 }
 
@@ -14,8 +14,11 @@ impl Entities {
             cars.push(Car::default())
         }
 
+        let road = Road::new();
+
         Entities {
-            cars
+            cars,
+            road
         }
     }
 
@@ -24,8 +27,9 @@ impl Entities {
         // todo!(); 
     }
 
-    pub fn draw(&mut self, context: &web_sys::CanvasRenderingContext2d) {
-        self.cars.iter_mut().for_each(|c| c.draw(context));
+    pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
+        self.cars.iter().for_each(|c| c.draw(context));
+        self.road.draw(context);
         // todo!(); 
     }
 }

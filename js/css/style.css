@@ -13,7 +13,7 @@ body {
 
 #app {
   display: grid;
-  grid-template-columns: auto 1fr 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 1rem;
   padding: 1rem;
   
@@ -39,6 +39,8 @@ canvas {
 
 #nodeCanvas {
   --border-hsl-lightness: 20%;
+  width: 500px;
+  max-width: 25vw;
 }
 
 /* ///// */

@@ -1,5 +1,6 @@
 use crate::helpers::lerpf;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
@@ -51,12 +52,14 @@ impl Default for Point {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Intersection {
     pub point: Point,
     pub offset: f64,
     pub intersects: bool,
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Line {
     pub start: Point,
     pub end: Point,
@@ -80,6 +83,19 @@ impl Line {
         self.end.move_towards(angle, distance);
     }
 
+    pub fn move_away(&mut self, angle: f64, distance: f64) {
+        self.move_towards(angle, -distance);
+    }
+
+    pub fn move_towards_separate(&mut self, angle: f64, distance_start: f64, distance_end: f64) {
+        self.start.move_towards(angle, distance_start);
+        self.end.move_towards(angle, distance_end);
+    }
+
+    pub fn move_away_separate(&mut self, angle: f64, distance_start: f64, distance_end: f64) {
+        self.move_towards_separate(angle, -distance_start, -distance_end);
+    }
+
     pub fn intersects(&self, other: &Line) -> bool {
         let a = self.end.y - self.start.y;
         let b = self.start.x - self.end.x;
@@ -92,26 +108,24 @@ impl Line {
     }
 
     pub fn get_intersection(&self, other: &Line) -> Option<Intersection> {
-        let a1 = self.end.y - self.start.y;
-        let b1 = self.start.x - self.end.x;
-        let c1 = a1 * self.start.x + b1 * self.start.y;
+        let a = &self.start;
+        let b = &self.end;
+        let c = &other.start;
+        let d = &other.end;
 
-        let a2 = other.end.y - other.start.y;
-        let b2 = other.start.x - other.end.x;
-        let c2 = a2 * other.start.x + b2 * other.start.y;
+        let denominator = (b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x);
 
-        let determinant = a1 * b2 - a2 * b1;
-        
-        if determinant == 0.0 {
+        if denominator == 0.0 {
             return None;
         }
 
-        let u = (b2 * c1 - b1 * c2) / determinant;
-        let t = (a1 * c2 - a2 * c1) / determinant;
-        let intersects = u >= 0.0 && u <= 1.0 && t >= 0.0 && t <= 1.0;
+        let t = ((d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x)) / denominator;
+        let u = ((a.x - b.x) * (c.y - a.y) - (a.y - b.y) * (c.x - a.x)) / denominator;
 
-        let x = lerpf(self.start.x, self.end.x, t);
-        let y = lerpf(self.start.y, self.end.y, t);
+        let intersects = t >= 0.0 && t <= 1.0 && u >= 0.0 && u <= 1.0;
+
+        let x = lerpf(a.x, b.x, t);
+        let y = lerpf(a.y, b.y, t);
         let point = Point { x, y };
 
         Some(Intersection { point, offset: t, intersects })

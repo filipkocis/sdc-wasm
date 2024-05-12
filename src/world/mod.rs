@@ -2,6 +2,7 @@ pub mod car;
 pub mod entities;
 pub mod road;
 pub mod finish;
+pub mod player;
 
 pub use car::*;
 pub use entities::*;

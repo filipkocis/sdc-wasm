@@ -1,6 +1,10 @@
 use web_sys::js_sys::Math;
 
-use crate::{Drawable, geo::{Polygon, Point}};
+use crate::{
+    Drawable, 
+    geo::{Polygon, Point}, 
+    sprite
+};
 
 pub struct Controls {
     pub forward: bool,
@@ -177,40 +181,15 @@ impl Car {
     }
 
     pub fn generate_polygons(width: f64, height: f64, angle: f64) -> Vec<Polygon> {
-        let mut polygons = Vec::with_capacity(1);
+        let mut sprite = sprite::get_car_sprite(); 
 
-        let car_box = Polygon::new(vec![
-            Point::default(),   
-            Point::new(0.0, 50.0),
-            Point::new(100.0, 50.0),
-            Point::new(100.0, 0.0)
-        ], "blue".to_owned());
-
-        let car_tire_back_left = Polygon::rectangle(20.0, 0.0, 25.0, 20.0, 0.0);
-        let car_tire_back_right = Polygon::rectangle(20.0, 50.0, 25.0, 20.0, 0.0);
-        let car_tire_front_left = Polygon::rectangle(80.0, 0.0, 25.0, 20.0, 0.0);
-        let car_tire_front_right = Polygon::rectangle(80.0, 50.0, 25.0, 20.0, 0.0);
-
-        // car_tire_front.fill_color = "gray".to_owned();
-        // car_tire_back.fill_color = "gray".to_owned();
-
-        let mut car_front = Polygon::rectangle(85.0, 25.0, 30.0, 40.0, 0.0);
-        car_front.fill_color = "yellow".to_owned();
-
-        polygons.push(car_tire_back_left);
-        polygons.push(car_tire_back_right);
-        polygons.push(car_tire_front_left);
-        polygons.push(car_tire_front_right);
-        polygons.push(car_box);
-        polygons.push(car_front);
-
-        polygons.iter_mut().for_each(|p| {
-            p.translate(-50.0, -25.0); 
-            p.scale(100.0 / height, 50.0 / width); 
-            p.rotate_origin(angle);
+        sprite.iter_mut().for_each(|poly| {
+            poly.translate(-50.0, -25.0); 
+            poly.scale_origin(height / 100.0, width / 50.0); 
+            poly.rotate_origin(angle);
         });
 
-        polygons
+        sprite
     }
 }
 
@@ -224,8 +203,8 @@ impl Drawable for Car {
 
 impl Default for Car{
     fn default() -> Car {
-        let width = 50.0;
-        let height = 100.0;
+        let width = 25.0;
+        let height = 50.0;
         let angle = rand::random::<f64>() * 2.0 * std::f64::consts::PI;
 
         Car::new(

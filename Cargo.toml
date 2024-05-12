@@ -31,6 +31,7 @@ features = [
   "CssStyleDeclaration",
 
   'MouseEvent',
+  'KeyboardEvent',
   'EventListener',
 ]
 

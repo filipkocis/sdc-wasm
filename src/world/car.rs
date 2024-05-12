@@ -121,20 +121,22 @@ impl Car {
         }
     }
 
-    pub fn turn_left(&mut self) {
-        self.angle -= 0.1;
-        self.hitbox.rotate(-0.1);
+    pub fn turn(&mut self, d_angle: f64) {
+        let d_angle = if self.speed >= 0.0 { d_angle } else { -d_angle }; 
+        self.angle += d_angle;
+        self.hitbox.rotate(d_angle);
 
         let car_origin = Point::new(self.x, self.y);
-        self.polygons.iter_mut().for_each(|p| p.rotate_around(-0.1, &car_origin));
+        self.polygons.iter_mut().for_each(|p| p.rotate_around(d_angle, &car_origin));
+
+    }
+
+    pub fn turn_left(&mut self) {
+        self.turn(-0.1);
     }
 
     pub fn turn_right(&mut self) {
-        self.angle += 0.1;
-        self.hitbox.rotate(0.1);
-
-        let car_origin = Point::new(self.x, self.y);
-        self.polygons.iter_mut().for_each(|p| p.rotate_around(0.1, &car_origin));
+        self.turn(0.1);
     }
 
     pub fn limit_speed(&mut self) {

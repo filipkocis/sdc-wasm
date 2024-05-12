@@ -307,6 +307,13 @@ impl Polygon {
         }
     }
 
+    pub fn scale_origin(&mut self, factor_x: f64, factor_y: f64) {
+        for point in self.points.iter_mut() {
+            point.x *= factor_x;
+            point.y *= factor_y;
+        }
+    }
+
     pub fn move_towards(&mut self, angle: f64, distance: f64) {
         for point in self.points.iter_mut() {
             point.move_towards(angle, distance)

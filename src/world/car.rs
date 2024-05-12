@@ -120,13 +120,17 @@ impl Car {
     pub fn turn_left(&mut self) {
         self.angle -= 0.1;
         self.hitbox.rotate(-0.1);
-        self.polygons.iter_mut().for_each(|p| p.rotate(-0.1));
+
+        let car_origin = Point::new(self.x, self.y);
+        self.polygons.iter_mut().for_each(|p| p.rotate_around(-0.1, &car_origin));
     }
 
     pub fn turn_right(&mut self) {
         self.angle += 0.1;
         self.hitbox.rotate(0.1);
-        self.polygons.iter_mut().for_each(|p| p.rotate(0.1));
+
+        let car_origin = Point::new(self.x, self.y);
+        self.polygons.iter_mut().for_each(|p| p.rotate_around(0.1, &car_origin));
     }
 
     pub fn limit_speed(&mut self) {
@@ -160,7 +164,7 @@ impl Car {
         if self.controls.forward { self.accelerate(); }
         if self.controls.backward { self.decelerate(); }
         if self.controls.left { self.turn_left(); }
-        if self.controls.right { self.turn_left(); }
+        if self.controls.right { self.turn_right(); }
         if self.controls.brake { self.brake(); }
 
         self.limit_speed();
@@ -182,17 +186,22 @@ impl Car {
             Point::new(100.0, 0.0)
         ], "blue".to_owned());
 
-        let mut car_tire_back = Polygon::rectangle(25.0, 0.0, 25.0, 25.0, 0.0);
-        let mut car_tire_front = Polygon::rectangle(75.0, 0.0, 25.0, 25.0, 0.0);
-        car_tire_front.fill_color = "gray".to_owned();
-        car_tire_back.fill_color = "gray".to_owned();
+        let car_tire_back_left = Polygon::rectangle(20.0, 0.0, 25.0, 20.0, 0.0);
+        let car_tire_back_right = Polygon::rectangle(20.0, 50.0, 25.0, 20.0, 0.0);
+        let car_tire_front_left = Polygon::rectangle(80.0, 0.0, 25.0, 20.0, 0.0);
+        let car_tire_front_right = Polygon::rectangle(80.0, 50.0, 25.0, 20.0, 0.0);
 
-        let mut car_front = Polygon::rectangle(85.0, 47.5, 30.0, 25.0, 0.0);
+        // car_tire_front.fill_color = "gray".to_owned();
+        // car_tire_back.fill_color = "gray".to_owned();
+
+        let mut car_front = Polygon::rectangle(85.0, 25.0, 30.0, 40.0, 0.0);
         car_front.fill_color = "yellow".to_owned();
 
+        polygons.push(car_tire_back_left);
+        polygons.push(car_tire_back_right);
+        polygons.push(car_tire_front_left);
+        polygons.push(car_tire_front_right);
         polygons.push(car_box);
-        polygons.push(car_tire_back);
-        polygons.push(car_tire_front);
         polygons.push(car_front);
 
         polygons.iter_mut().for_each(|p| {

@@ -270,15 +270,15 @@ impl Polygon {
 
     pub fn rotate(&mut self, angle: f64) {
         let center = self.center();
-        self.rotate_around(angle, center)
+        self.rotate_around(angle, &center)
     }
 
     pub fn rotate_origin(&mut self, angle: f64) {
         let center = Point::default();
-        self.rotate_around(angle, center);
+        self.rotate_around(angle, &center);
     }
 
-    pub fn rotate_around(&mut self, angle: f64, center: Point) {
+    pub fn rotate_around(&mut self, angle: f64, center: &Point) {
         let cos = angle.cos();
         let sin = angle.sin();
 

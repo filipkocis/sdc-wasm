@@ -48,6 +48,7 @@ impl RoadLine {
     }
 
     pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
+        context.save();
         context.set_line_width(5.0);
         context.set_fill_style(&JsValue::from_str("white"));
 
@@ -59,6 +60,7 @@ impl RoadLine {
         self.line.draw(context);
 
         context.fill();
+        context.restore();
     }
 }
 

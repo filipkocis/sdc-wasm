@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::{world::*, Drawable};
 
 pub struct Entities {
@@ -9,12 +11,14 @@ pub struct Entities {
 
 impl Entities {
     pub fn new() -> Entities {
+        let mut rng = rand::thread_rng();
         let mut cars = Vec::new();
-        for _ in 0..1_000 {
-            cars.push(Car::default())
-        }
-
         let road = Road::new();
+
+        for _ in 0..1_000 {
+            cars.push(Car::new_at(rng.gen_range(0.0..500.0), 350.0))
+            // cars.push(Car::new_at(rng.gen_range(500.0..800.0), 600.0))
+        }
 
         Entities {
             cars,

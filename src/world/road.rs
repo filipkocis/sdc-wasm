@@ -1,11 +1,12 @@
 use wasm_bindgen::JsValue;
 
-use crate::{geo::*, console_log, js, Drawable};
+use crate::{geo::*, js, Drawable};
 
 
 pub struct Road {
     pub lines: Vec<RoadLine>,
     pub points: Vec<RoadPoint>,
+    pub hitbox: Polygon,
 }
 
 pub struct RoadPoint {
@@ -70,6 +71,7 @@ impl Road {
         Road {
             lines: vec![],
             points: vec![],
+            hitbox: Polygon::new(vec![], "white".to_string())
         }
     }
 
@@ -86,6 +88,8 @@ impl Road {
 
     pub fn construct(&mut self) {
         self.lines.clear();
+        self.hitbox.points.clear();
+
         for i in 0..self.points.len() {
             let a = &self.points[i];
             let b = &self.points[(i + 1) % self.points.len()];
@@ -116,6 +120,16 @@ impl Road {
             Road::merge(lines, i);
         }
 
+        let mut hitbox_points = vec![];
+        self.lines.iter().for_each(|l| hitbox_points.push(l.left.start));
+        if self.lines.len() > 1 {
+            hitbox_points.push(self.lines.last().unwrap().left.end);
+            hitbox_points.push(self.lines.last().unwrap().right.end);
+        }
+        self.lines.iter().rev().for_each(|l| hitbox_points.push(l.right.start));
+
+        self.hitbox.points = hitbox_points;
+
         let points_str = self.points.iter().map(|p| format!("{:.2} {:.2} {:.2}", p.point.x, p.point.y, p.width)).collect::<Vec<String>>().join(", \n");
 
         js::get_element_by_id("rustOutput").set_text_content(Some(&points_str));
@@ -137,8 +151,11 @@ impl Road {
             lines[next_index].right.start = intersection.point; 
         }
     }
+}
 
-    pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
+impl Drawable for Road {
+    fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
+        self.hitbox.draw(context);
         self.lines.iter().for_each(|l| l.draw(context));
     }
 }
@@ -164,7 +181,7 @@ impl Road {
             RoadPoint { point: Point::new(89.0, 510.0), width: 43.34 }, 
         ];
 
-        let mut road = Road { points, lines: vec![] };
+        let mut road = Road { points, lines: vec![], hitbox: Polygon::new(vec![], "white".to_string()) };
         road.construct();
 
         road

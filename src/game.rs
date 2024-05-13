@@ -62,10 +62,11 @@ impl Game {
 
             let closure = Closure::<dyn FnMut(_)>::new(move |event: web_sys::MouseEvent| {
                 let point = Point::from_event(&event, &context.borrow().element);
-                let entities_borrow_road = &mut entities.borrow_mut().road;
+                let entities_borrow = &mut entities.borrow_mut();
 
-                entities_borrow_road.add_point(point, rng.gen_range(35.0..75.00));
-                entities_borrow_road.construct();
+                entities_borrow.road.add_point(point, rng.gen_range(35.0..75.00));
+                entities_borrow.road.construct();
+                entities_borrow.finish_line = FinishLine::new(&entities_borrow.road);
 
                 console_log!("{} {}", event.client_x(), event.client_y());
             });

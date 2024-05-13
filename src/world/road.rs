@@ -124,8 +124,6 @@ impl Road {
     pub fn merge(lines: &mut [RoadLine], index: usize) {
         let next_index = (index + 1) % lines.len(); 
 
-        console_log!("{} {}", index, next_index);
-
         let left_intersection = lines[index].left.get_intersection(&lines[next_index].left);
         let right_intersection = lines[index].right.get_intersection(&lines[next_index].right);
 
@@ -142,5 +140,33 @@ impl Road {
 
     pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
         self.lines.iter().for_each(|l| l.draw(context));
+    }
+}
+
+impl Road {
+    pub fn load() -> Road {
+        let points = vec![
+            RoadPoint { point: Point::new(191.0, 653.0), width: 53.19 }, 
+            RoadPoint { point: Point::new(484.0, 715.0), width: 51.37 }, 
+            RoadPoint { point: Point::new(750.0, 730.0), width: 71.04 }, 
+            RoadPoint { point: Point::new(946.0, 671.0), width: 44.13 }, 
+            RoadPoint { point: Point::new(1004.0, 551.0), width: 68.13 }, 
+            RoadPoint { point: Point::new(969.0, 367.0), width: 68.58 }, 
+            RoadPoint { point: Point::new(931.0, 174.0), width: 60.45 }, 
+            RoadPoint { point: Point::new(799.0, 55.0), width: 62.85 }, 
+            RoadPoint { point: Point::new(612.0, 97.0), width: 73.47 }, 
+            RoadPoint { point: Point::new(509.0, 173.0), width: 50.77 }, 
+            RoadPoint { point: Point::new(497.0, 300.0), width: 66.28 }, 
+            RoadPoint { point: Point::new(470.0, 358.0), width: 46.56 }, 
+            RoadPoint { point: Point::new(313.0, 278.0), width: 66.98 }, 
+            RoadPoint { point: Point::new(153.0, 180.0), width: 72.08 }, 
+            RoadPoint { point: Point::new(96.0, 320.0), width: 74.9 }, 
+            RoadPoint { point: Point::new(89.0, 510.0), width: 43.34 }, 
+        ];
+
+        let mut road = Road { points, lines: vec![] };
+        road.construct();
+
+        road
     }
 }

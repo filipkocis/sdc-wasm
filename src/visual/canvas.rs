@@ -23,8 +23,8 @@ impl Canvas {
     pub fn resize(&self) {
         let computed_style = self.element.get_bounding_client_rect();
 
-        self.element.set_width(computed_style.width() as u32 * 10);
-        self.element.set_height(computed_style.height() as u32 * 10);
+        self.element.set_width(computed_style.width() as u32);
+        self.element.set_height(computed_style.height() as u32);
     }
 
     pub fn clear(&self) {

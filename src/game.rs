@@ -64,7 +64,7 @@ impl Game {
                 let point = Point::from_event(&event, &context.borrow().element);
                 let entities_borrow_road = &mut entities.borrow_mut().road;
 
-                entities_borrow_road.add_point(point, rng.gen_range(10.0..75.00));
+                entities_borrow_road.add_point(point, rng.gen_range(35.0..75.00));
                 entities_borrow_road.construct();
 
                 console_log!("{} {}", event.client_x(), event.client_y());

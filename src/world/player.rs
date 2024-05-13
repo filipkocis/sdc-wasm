@@ -3,7 +3,7 @@ use std::{rc::Rc, cell::RefCell};
 use wasm_bindgen::prelude::*;
 use web_sys::window;
 
-use crate::{car::Car, Drawable};
+use crate::{car::Car, Drawable, Road};
 
 pub struct Player {
     pub car: Rc<RefCell<Car>>,
@@ -20,8 +20,8 @@ impl Player {
         player
     }
 
-    pub fn update(&self) {
-        self.car.borrow_mut().update();
+    pub fn update(&self, road: &Road) {
+        self.car.borrow_mut().update(road);
     }
 
     pub fn add_controls_listeners(&self) {

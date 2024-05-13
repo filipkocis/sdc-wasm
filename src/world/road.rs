@@ -1,6 +1,6 @@
 use wasm_bindgen::JsValue;
 
-use crate::{geo::*, console_log, js};
+use crate::{geo::*, console_log, js, Drawable};
 
 
 pub struct Road {

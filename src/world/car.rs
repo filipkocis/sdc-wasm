@@ -199,7 +199,7 @@ impl Drawable for Car {
     fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
         self.hitbox.draw(context);
         // self.sensors.draw(context);
-        self.polygons.iter().for_each(|p| p.draw(context));
+        self.polygons.draw(context);
     }
 }
 

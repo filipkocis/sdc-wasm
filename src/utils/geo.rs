@@ -17,6 +17,17 @@ impl Point {
         ((self.x - other.x).powi(2) + (self.y - other.y).powi(2)).sqrt()
     }
 
+    pub fn rotate_around(&mut self, angle: f64, center: &Point) {
+        let cos = angle.cos();
+        let sin = angle.sin();
+
+        let x = self.x - center.x;
+        let y = self.y - center.y;
+
+        self.x = center.x + x * cos - y * sin;
+        self.y = center.y + x * sin + y * cos;
+    }
+
     pub fn angle(&self, other: &Point) -> f64 {
         (other.y - self.y).atan2(other.x - self.x)
     }
@@ -79,6 +90,23 @@ impl Line {
     pub fn angle(&self) -> f64 {
         self.start.angle(&self.end)
     }
+
+    pub fn translate(&mut self, x: f64, y: f64) {
+        self.start.x += x;
+        self.start.y += y;
+        self.end.x += x;
+        self.end.y += y;
+    }
+
+    pub fn rotate(&mut self, angle: f64) {
+        let center = self.start;
+        self.rotate_around(angle, &center)
+    }
+
+    pub fn rotate_around(&mut self, angle: f64, center: &Point) {
+        self.start.rotate_around(angle, center); 
+        self.end.rotate_around(angle, center); 
+    }   
 
     pub fn move_towards(&mut self, angle: f64, distance: f64) {
         self.start.move_towards(angle, distance);
@@ -219,8 +247,6 @@ impl Polygon {
 
         let mut polygon = Polygon::new(points, "black".to_owned());
         polygon.rotate(angle);
-
-        console_log!("{} {} : {:?}", x, y, polygon.points);
 
         polygon
     }

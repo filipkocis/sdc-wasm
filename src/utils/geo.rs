@@ -1,6 +1,6 @@
 use wasm_bindgen::JsValue;
 
-use crate::{helpers::lerpf, console_log};
+use crate::{helpers::lerpf, console_log, Drawable};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Point {
@@ -163,8 +163,10 @@ impl Line {
 
         Some(Intersection { point, offset: t, intersects })
     }
+}
 
-    pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
+impl Drawable for Line {
+     fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
         context.begin_path();
         context.move_to(self.start.x, self.start.y);
         context.line_to(self.end.x, self.end.y);
@@ -221,25 +223,6 @@ impl Polygon {
         console_log!("{} {} : {:?}", x, y, polygon.points);
 
         polygon
-    }
-
-    pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
-        if self.points.len() < 2 {
-            return;
-        }
-
-        context.set_fill_style(&JsValue::from_str(self.fill_color.as_str()));
-        context.set_stroke_style(&JsValue::from_str(self.stroke_color.as_str()));
-        context.begin_path();
-
-        context.move_to(self.points[0].x, self.points[0].y);
-        for point in self.points.iter().skip(1) {
-            context.line_to(point.x, point.y);
-        }
-
-        context.close_path();
-        context.fill();
-        context.stroke();
     }
 
     pub fn intersects(&self, other: &Polygon) -> bool {
@@ -318,5 +301,26 @@ impl Polygon {
         for point in self.points.iter_mut() {
             point.move_towards(angle, distance)
         }
+    }
+}
+
+impl Drawable for Polygon {
+    fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
+        if self.points.len() < 2 {
+            return;
+        }
+
+        context.set_fill_style(&JsValue::from_str(self.fill_color.as_str()));
+        context.set_stroke_style(&JsValue::from_str(self.stroke_color.as_str()));
+        context.begin_path();
+
+        context.move_to(self.points[0].x, self.points[0].y);
+        for point in self.points.iter().skip(1) {
+            context.line_to(point.x, point.y);
+        }
+
+        context.close_path();
+        context.fill();
+        context.stroke();
     }
 }

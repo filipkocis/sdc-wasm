@@ -3,7 +3,7 @@ use web_sys::js_sys::Math;
 use crate::{
     Drawable, 
     geo::{Polygon, Point}, 
-    sprite
+    sprite, console_log, sensors::Sensors
 };
 
 pub struct Controls {
@@ -70,7 +70,7 @@ pub struct Car {
     pub controls: Controls,
     pub hitbox: Polygon,
 
-    // pub sensors: Vec<Sensor>,    
+    pub sensors: Sensors,    
     // pub brain: Brain,
     // pub fitness: f64,
     pub has_collided: bool,
@@ -85,10 +85,13 @@ impl Car {
         hitbox.fill_color = "transparent".to_owned();
         hitbox.scale(1.2, 1.2);
 
+        let sensors = Sensors::new(x, y, 6, 200.0, std::f64::consts::PI / 2.0, angle);
+
         Car {
             x, y, width, height, angle, 
             speed, max_speed, acceleration, friction, 
             polygons, controls, hitbox,
+            sensors,
             has_collided: false,
         }
     } 
@@ -100,6 +103,7 @@ impl Car {
 
         default_car.hitbox.translate(x, y);
         default_car.polygons.iter_mut().for_each(|p| p.translate(x, y));
+        default_car.sensors.translate(x, y);
 
         default_car 
     }
@@ -131,7 +135,7 @@ impl Car {
 
         let car_origin = Point::new(self.x, self.y);
         self.polygons.iter_mut().for_each(|p| p.rotate_around(d_angle, &car_origin));
-
+        self.sensors.rotate(d_angle);
     }
 
     pub fn turn_left(&mut self) {
@@ -167,6 +171,7 @@ impl Car {
 
         self.hitbox.translate(d_x, d_y);
         self.polygons.iter_mut().for_each(|p| p.translate(d_x, d_y));
+        self.sensors.translate(d_x, d_y);
     }
 
     pub fn apply_controls(&mut self) {
@@ -200,26 +205,25 @@ impl Car {
 
 impl Drawable for Car {
     fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
-        self.hitbox.draw(context);
-        // self.sensors.draw(context);
+        // self.hitbox.draw(context);
+        self.sensors.draw(context);
         self.polygons.draw(context);
     }
 }
 
 impl Default for Car{
     fn default() -> Car {
-        let width = 25.0;
-        let height = 50.0;
-        let angle = rand::random::<f64>() * 2.0 * std::f64::consts::PI;
+        let width = 40.0;
+        let height = 80.0;
 
         Car::new(
             0.0,
             0.0,
             width,
             height,
-            angle,
-            10.0,
-            25.0,
+            0.0,
+            0.0,
+            20.0,
             0.1,
             0.05,
         )

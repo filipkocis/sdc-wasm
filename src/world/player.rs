@@ -12,9 +12,10 @@ pub struct Player {
 impl Player {
     pub fn new() -> Player {
         let player = Player {
-            car: Rc::new(RefCell::new(Car::default())),
+            car: Rc::new(RefCell::new(Car::new_at(200.0, 200.0))),
         };
         player.add_controls_listeners();
+        player.car.borrow_mut().speed = 0.0;
 
         player
     }

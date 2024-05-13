@@ -1,5 +1,3 @@
-use rand::Rng;
-
 use crate::{world::*, Drawable};
 use self::player::Player;
 
@@ -7,25 +5,29 @@ pub struct Entities {
     pub cars: Vec<Car>,
     pub player: Option<Player>,
     pub road: Road,
-    // pub finish_line: FinishLine,
+    pub finish_line: FinishLine,
 }
 
 impl Entities {
     pub fn new() -> Entities {
-        let mut rng = rand::thread_rng();
         let mut cars = Vec::new();
-        let road = Road::new();
+        let road = Road::load();
         let player = Player::new();
+        let finish_line = FinishLine::new(&road);
 
-        for _ in 0..1 {
-            cars.push(Car::new_at(rng.gen_range(0.0..500.0), 350.0))
-            // cars.push(Car::new_at(rng.gen_range(500.0..800.0), 600.0))
+        let start_origin = finish_line.start.center();
+        let start_angle = finish_line.start.points[0].angle(&finish_line.start.points[3]);
+        for _ in 0..10 {
+            let mut car = Car::new_at(start_origin.x, start_origin.y);
+            car.turn(start_angle);
+            cars.push(car)
         }
 
         Entities {
             cars,
             player: Some(player),
-            road
+            road,
+            finish_line
         }
     }
 
@@ -38,12 +40,13 @@ impl Entities {
     }
 
     pub fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
-        self.cars.iter().for_each(|c| c.draw(context));
         self.road.draw(context);
+        self.finish_line.draw(context);  
+
+        self.cars.draw(context);
         if let Some(player) = &self.player {
             player.draw(context);
         }
-        // todo!(); 
     }
 }
 

@@ -1,8 +1,8 @@
 use wasm_bindgen::JsValue;
 
-use crate::{helpers::lerpf, console_log, Drawable};
+use crate::{helpers::lerpf, Drawable};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
@@ -191,6 +191,18 @@ impl Line {
 
         Some(Intersection { point, offset: t, intersects })
     }
+
+    pub fn matches_one_point_only(&self, other: &Line) -> bool {
+        self.start == other.start && self.end != other.end || 
+        self.start == other.end && self.end != other.start || 
+        self.end == other.start && self.start != other.end || 
+        self.end == other.end && self.start != other.start
+    }
+
+    pub fn matches_both_points(&self, other: &Line) -> bool {
+        self.start == other.start && self.end == other.end ||
+        self.start == other.end && self.end == other.start
+    }
 }
 
 impl Drawable for Line {
@@ -217,8 +229,23 @@ impl Polygon {
             stroke_color: "black".to_owned()
         }
     }
-    
+
+    pub fn lines(&self) -> Vec<Line> {
+        let mut lines = Vec::new();
+
+        for i in 0..self.points.len() {
+            let j = (i + 1) % self.points.len();
+            lines.push(Line::new(self.points[i], self.points[j]));
+        }
+
+        lines
+    }
+
     pub fn center(&self) -> Point {
+        if self.points.is_empty() {
+            return Point::default();
+        }
+
         let mut x = 0.0;
         let mut y = 0.0;
 
@@ -264,13 +291,19 @@ impl Polygon {
                 let c = &other.points[i_other];
                 let d = &other.points[j_other];
 
-                if Line::check_aabb_intersection(a, b, c, d) {
-                    continue;
-                }
+                // if Line::check_aabb_intersection(a, b, c, d) {
+                //     continue;
+                // }
 
-                if Line::intersects_lines(a, b, c, d) {
-                    return true;
-                }
+                if let Some(intersection) = Line::get_intersection(&Line::new(*a, *b), &Line::new(*c, *d)) {
+                    if intersection.intersects {
+                        return true;
+                    }
+                };
+
+                // if Line::intersects_lines(a, b, c, d) {
+                //     return true;
+                // }
             }
         }
 

@@ -3,7 +3,7 @@ use web_sys::js_sys::Math;
 use crate::{
     Drawable, 
     geo::{Polygon, Point}, 
-    sprite, console_log, sensors::Sensors
+    sprite, console_log, sensors::Sensors, Road
 };
 
 pub struct Controls {
@@ -83,9 +83,9 @@ impl Car {
 
         let mut hitbox = Polygon::rectangle(x, y, height, width, angle);
         hitbox.fill_color = "transparent".to_owned();
-        hitbox.scale(1.2, 1.2);
+        hitbox.scale(1.0, 1.0);
 
-        let sensors = Sensors::new(x, y, 6, 200.0, std::f64::consts::PI / 2.0, angle);
+        let sensors = Sensors::new(x, y, 7, 200.0, std::f64::consts::PI, angle);
 
         Car {
             x, y, width, height, angle, 
@@ -95,6 +95,12 @@ impl Car {
             has_collided: false,
         }
     } 
+
+    pub fn collide(&mut self) {
+        self.has_collided = true;
+        self.speed = 0.0;
+        self.controls.reset();
+    }
 
     pub fn new_at(x: f64, y: f64) -> Car {
         let mut default_car = Car::default();
@@ -185,9 +191,19 @@ impl Car {
     }
 
     
-    pub fn update(&mut self) {
+    pub fn update(&mut self, road: &Road) {
+        if self.has_collided { return; }
+
         self.apply_controls();
         self.move_coords();
+        self.sensors.update(&road);
+        self.check_collisions(road);
+    }
+
+    pub fn check_collisions(&mut self, road: &Road) {
+        if self.hitbox.intersects(&road.hitbox) {
+            self.collide();
+        }
     }
 
     pub fn generate_polygons(width: f64, height: f64, angle: f64) -> Vec<Polygon> {

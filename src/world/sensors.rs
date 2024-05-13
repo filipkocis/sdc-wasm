@@ -1,6 +1,6 @@
 use wasm_bindgen::JsValue;
 
-use crate::{geo::{Line, Point}, helpers, Drawable};
+use crate::{geo::{Line, Point, Polygon}, helpers, Drawable, Road};
 
 pub struct Sensor {
     pub ray: Line,
@@ -35,6 +35,57 @@ impl Sensors {
         }
     }
 
+    pub fn update(&mut self, road: &Road) {
+        self.reset();
+
+        self.check_polygon(&road.hitbox);
+    }
+
+    pub fn reset(&mut self) {
+        self.sensors.iter_mut().for_each(|s| s.reading = 0.0);
+    }
+
+    pub fn check(&mut self, obstacles: &Vec<Line>) {
+        if obstacles.is_empty() { return }
+        let last = obstacles.last().unwrap();
+
+        for sensor in self.sensors.iter_mut() {
+            for obstacle in obstacles.iter() {
+                // skip the last line which is the finish line
+                if obstacle.matches_both_points(last) { continue }
+
+                let intersection = sensor.ray.get_intersection(obstacle);
+
+                if let Some(intersection) = intersection {
+                    if !intersection.intersects { continue }
+
+                    if sensor.reading == 0.0 || intersection.offset < sensor.reading {
+                        sensor.reading = intersection.offset;
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn check_polygon(&mut self, obstacle: &Polygon) {
+        self.check(&obstacle.lines());
+        // for sensor in self.sensors.iter_mut() {
+        //     for line in obstacle.lines() {
+        //         let intersection = sensor.ray.get_intersection(&line);
+        //
+        //         if let Some(intersection) = intersection {
+        //             sensor.reading = intersection.offset;
+        //
+        //             if sensor.reading < 0.0 || sensor.reading > 1.0 {
+        //                 sensor.reading = 0.0;
+        //             }
+        //
+        //             break;
+        //         }
+        //     }
+        // }
+    }
+
     pub fn translate(&mut self, x: f64, y: f64) {
         self.x += x;
         self.y += y;
@@ -53,24 +104,37 @@ impl Sensors {
 
 impl Drawable for Sensors {
     fn draw(&self, context: &web_sys::CanvasRenderingContext2d) {
-        context.set_stroke_style(&JsValue::from_str("yellow"));
-        context.set_line_width(1.0);
+        // context.set_stroke_style(&JsValue::from_str("yellow"));
+        // context.set_line_width(1.0);
     
+        // for sensor in self.sensors.iter() {
+        //     context.begin_path();
+        //     context.move_to(sensor.ray.start.x, sensor.ray.start.y);
+        //     context.line_to(sensor.ray.end.x, sensor.ray.end.y);
+        //
+        //     context.stroke();
+        // }
+        
+        context.set_line_width(1.0);
+
         for sensor in self.sensors.iter() {
+            context.set_stroke_style(&JsValue::from_str("lime"));
+
+            let reading_point = Point::new(
+                sensor.ray.start.x + (sensor.reading * sensor.length) * sensor.ray.angle().cos(), 
+                sensor.ray.start.y + (sensor.reading * sensor.length) * sensor.ray.angle().sin()
+            ); 
+
             context.begin_path();
             context.move_to(sensor.ray.start.x, sensor.ray.start.y);
-            context.line_to(sensor.ray.end.x, sensor.ray.end.y);
-
+            context.line_to(reading_point.x, reading_point.y); 
             context.stroke();
-        }
 
-        context.set_stroke_style(&JsValue::from_str("black"));
-
-        for sensor in self.sensors.iter() {
+            context.set_stroke_style(&JsValue::from_str("black"));
+            context.set_fill_style(&JsValue::from_str("lime"));
             context.begin_path();
-            context.arc(sensor.ray.end.x, sensor.ray.end.y, 2.0, 0.0, 2.0 * std::f64::consts::PI).unwrap();
+            context.arc(reading_point.x, reading_point.y, 2.5, 0.0, 2.0 * std::f64::consts::PI).unwrap();
             context.fill();
-            
             context.stroke();
         }
     }

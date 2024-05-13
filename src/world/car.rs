@@ -114,11 +114,14 @@ impl Car {
     }
 
     pub fn brake(&mut self) {
-        if Math::abs(self.speed) > 0.0 {
-            self.decelerate();
+        let brake_force = self.acceleration * 2.5;
+        let new_speed = Math::max(Math::abs(self.speed) - brake_force, 0.0);
+
+        if self.speed >= 0.0 {
+            self.speed = new_speed;
         } else {
-            self.speed = 0.0;
-        }
+            self.speed = -new_speed;
+        } 
     }
 
     pub fn turn(&mut self, d_angle: f64) {
